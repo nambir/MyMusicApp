@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/2b070e02a1.js" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="script.js"></script>
+    <script src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+</head>
+
+<body onload="FunPageLoad()">
+    <style>
+        div#plytime {
+            margin-left: 300 px !important;
+        }
+        
+        .border {
+            border: 1px solid #191a1a!important;
+        }
+        
+        #btnplylst {
+            width: 535 px !important;
+        }
+    </style>
+
+    <script>
+        function FunPageLoad() {
+            addsongs.style.display = "none";
+            btnadd.style.display = "none";
+            searchforsongs.style.display = "none";
+        }
+
+        function GetAllSongLists() {
+            searchforsongs.style.display = "block";
+            document.getElementById('songlistdetails').innerHTML = "";
+            $.ajax({
+                mode: 'cors',
+                type: "GET",
+                url: "http://localhost:60896/api/MusicApp/GetAllSongs",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    /* Authorization header */
+                    xhr.setRequestHeader("Authorization", "Bearer " + 'xyz');
+                },
+                success: function(result, status, xhr) {
+                    var html = "<table id='tblsongsList' class='table table-condensed table-bordered'><tbody>";
+                    for (var i = 0; i < result.length; i++) {
+                        if (result.length != null) {
+                            var songtit = result[i].SongTitle;
+                            var singer = result[i].Singers;
+                            var album = result[i].Album;
+                            var playduration = result[i].PlayTime;
+                        }
+                        html += "<tr><td><p>Song Title: " + songtit + "</p><p>Singer: " + singer + "</p><p>Album:" + album + " </p></td><td style='vertical-align: middle;'><p>Playtime: " + playduration + "</p></td></tr>";
+                    }
+                    html += "</tbody></table>";
+                    $("#songlistdetails").append(html);
+                },
+                error: function(xhr, status, error) {
+                    alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
+                }
+            });
+        }
+
+
+        function PlayListClk() {
+            btnadd.style.display = "block";
+            songlistdetails.style.display = "none";
+            searchforsongs.style.display = "none";
+            addsongs.style.display = "none";
+            var playlist = document.getElementById("PlayListShow");
+            if (playlist.style.display === "none") {
+                playlist.style.display = "block";
+            } else {
+                playlist.style.display = "none";
+            }
+            $.ajax({
+                mode: 'cors',
+                type: "GET",
+                url: "http://localhost:60896/api/MusicApp/GetAllPlaylist",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    /* Authorization header */
+                    xhr.setRequestHeader("Authorization", "Bearer " + 'xyz');
+                },
+                success: function(result, status, xhr) {
+                    $("#addplay").html('');
+                    for (var i = 0; i < result.length; i++) {
+                        if (result.length != null) {
+                            var playlistid = result[i].PlayListId;
+                            var playlistname = result[i].PlayListName;
+                            var createddate = result[i].CreatedDate;
+                        }
+                        $("#addplay").append('<button id="btnplylst" onclick="addplaylists(' + result[i].PlayListId + ');"  <div class="row border" style="width:520px">' + '<div class="col-md-8" style="padding-right:428px">PlayListId:' + '&nbsp' + playlistid + '</div>' + '<div class="col-md-8" style="padding-right:280px">PlayListName:' + '&nbsp' + playlistname + '</div>' + '<div class="col-md-8" style="padding-right:49px">CreatedDate:' + '&nbsp' + createddate, '</div>', "<br>", '</div>', "</button>")
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
+                }
+            });
+        }
+
+        function addplaylists(playlistId) {
+            addsongs.style.display = "none";
+            addnewsong.style.display = "block";
+            createplaylist.style.display = "none";
+            btnadd.style.display = "none";
+            addplay.style.display = "none";
+            sessionStorage.setItem("playListId", playlistId);
+            $.ajax({
+                mode: 'cors',
+                type: "GET",
+                url: "http://localhost:60896/api/MusicApp/GetSongsForPlaylist?playListId=" + playlistId,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    /* Authorization header */
+                    xhr.setRequestHeader("Authorization", "Bearer " + 'xyz');
+                },
+                success: function(result, status, xhr) {
+                    for (var i = 0; i < result.length; i++) {
+                        if (result.length != null) {
+                            var songtit = result[i].SongTitle;
+                            var singer = result[i].Singers;
+                            var album = result[i].Album;
+                            var playduration = result[i].PlayTime;
+                        }
+                        $("#showsonglistdetails").append('<div class="row border" style="width:520px">' + '<div class="col-md-4" style="padding-right:280px">SongTitle:' + '&nbsp' + songtit + '</div>' + '<div class="col-md-1" style="padding-right:280px">Singer:' + '&nbsp' + singer + '<div id="test" style="margin-left:300px;margin-top:-24px">' + '<div id="plytime" class="col-md-1">' + "PlayTime:" + '&nbsp' + playduration + '</div>' + '</div>' + '<div class="col-md-4" style="padding-right:280px">Album:' + '&nbsp' + album, '</div>', "<br>", '</div>')
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
+                }
+            });
+
+        }
+
+
+        function Addplaylist() {
+            var inputText = document.getElementById('createplaylist').value;
+            if (inputText == null | inputText == "") {
+                return false;
+            } else {
+                $.ajax({
+                    mode: 'cors',
+                    type: "POST",
+                    url: "http://localhost:60896/api/MusicApp/PlayList?playListName=" + inputText,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    beforeSend: function(xhr) {
+                        /* Authorization header */
+                        xhr.setRequestHeader("Authorization", "Bearer " + 'xyz');
+                    },
+                    success: function(result, status, xhr) {
+                        if (result != null) {
+                            result.PlayListName = inputText;
+                            $("#addplay").append('<button id="btnplylst" onclick="addplaylists();"  <div class="row border" style="width:520px">' + '<div class="col-md-8" style="padding-right:428px">PlayListId:' + '&nbsp' + result.PlayListId + '</div>' + '<div class="col-md-8" style="padding-right:280px">PlayListName:' + '&nbsp' + result.PlayListName + '</div>' + '<div class="col-md-8" style="padding-right:49px">CreatedDate:' + '&nbsp' + result.CreatedDate, '</div>', "<br>", '</div>', "</button>")
+                        }
+                        alert('playList Saved Successfully');
+                    },
+                    error: function(xhr, status, error) {
+                        alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
+                    }
+                });
+            }
+        }
+
+
+        function Addsongslist() {
+            addsongs.style.display = "block";
+            addnewsong.style.display = "none";
+            showsonglistdetails.style.display = "none";
+            $.ajax({
+                mode: 'cors',
+                type: "GET",
+                url: "http://localhost:60896/api/MusicApp/GetAllSongs",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    /* Authorization header */
+                    xhr.setRequestHeader("Authorization", "Bearer " + 'xyz');
+                },
+                success: function(result, status, xhr) {
+                    var html = "<table id='tblAddsongsList' class='table table-condensed table-bordered'><tbody>";
+                    for (var i = 0; i < result.length; i++) {
+                        if (result.length != null) {
+                            var songlistid = result[i].SongId;
+                            var songtit = result[i].SongTitle;
+                            var singer = result[i].Singers;
+                            var album = result[i].Album;
+                            var playduration = result[i].PlayTime;
+                        }
+                        var idstorage = sessionStorage.getItem("playListId");
+                        html += "<tr><td><p>Song Title: " + songtit + "</p><p>Singer: " + singer + "</p><p>Album:" + album + " </p></td><td style='vertical-align: middle;'><p>Playtime: " + playduration + "</p></td><td><a href='#' style='vertical-align: middle;' onclick='AddSongtoPlayList(" + songlistid + "," + idstorage + ");' id='addsonglist' >Add to List</a></td></tr>";
+
+                    }
+                    html += "</tbody></table>";
+                    $("#showsongaddlistdetails").append(html);
+                },
+                error: function(xhr, status, error) {
+                    alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
+                }
+            });
+        }
+
+        function AddSongtoPlayList(songlistid, idstorage) {
+            $.ajax({
+                mode: 'cors',
+                type: "POST",
+                url: "http://localhost:60896/api/MusicApp/PlayListSongs?songId=" + songlistid + "&playListId=" + idstorage,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    /* Authorization header */
+                    xhr.setRequestHeader("Authorization", "Bearer " + 'xyz');
+                },
+                success: function(result, status, xhr) {
+                    if (result != null) {}
+                },
+                error: function(xhr, status, error) {
+                    alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
+                }
+            });
+
+        }
+
+        function FilterSongList() {
+            var value = $("#searchList").val().toLowerCase();
+            $("#tblsongsList tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        }
+
+
+        function FilterAddSongList() {
+            var value = $("#searchAddsong").val().toLowerCase();
+            $("#tblAddsongsList tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        }
+    </script>
+    <div align="Center" style="padding-top: 50px;width: 600px;height: 1400px; border: 1px solid rgb(5, 5, 5);padding: 50px;margin: 20px;">
+        <button id="btnlist" type="submit" style="height: 33px;width: 130px; background-color: chartreuse;" onclick="GetAllSongLists()">All Songs</button>
+        <button type="submit" style="height: 33px;width: 130px;" onclick="PlayListClk()">PlayLists</button><br>&nbsp;
+        <div id="addsongs">
+            <input type="text" id="searchAddsong" onkeyup="FilterAddSongList()" placeholder="Search for Add Songs..." name="search" style="width: 500px;height: 33px;margin-right: 165px;">
+        </div>
+        <button id="addnewsong" type="submit" style="height: 33px;width: 130px; background-color: chartreuse;display: none; margin-left:314px;margin-top:-3px;" onclick="Addsongslist()">Add Song</button>
+        <div id="PlayListShow" style="display:none;">
+            <input id="createplaylist" type="text" placeholder="Create PlayList" name="search" style="width: 300px;height: 30px;">
+        </div>&nbsp;
+        <button id="btnadd" type="submit" style="height: 33px;width: 130px;" onclick="Addplaylist()">Add PlayList</button>
+        <div id="searchforsongs" style="padding-top: 10px;">
+            <input type="text" id="searchList" onkeyup="FilterSongList()" placeholder="Search for Songs..." name="search" style="width: 510px;height: 33px;"></div><br>
+        <div id="addplay" class="container-mycontainer"></div>
+        <div id="addsongplay" class="container-mycontainer" style="display:none;"></div>
+        <div id="songlistdetails" class="container-mycontainer">
+        </div>
+        <div id="showsonglistdetails" class="container-mycontainer">
+        </div>
+        <div id="showsongaddlistdetails" class="container-mycontainer" style="margin-top: 42px">
+        </div>
+    </div>
+</body>
+
+</html>
