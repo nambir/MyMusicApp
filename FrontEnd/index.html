@@ -40,7 +40,16 @@
         }
 
         function GetAllSongLists() {
+            addsongs.style.display = "none";
             searchforsongs.style.display = "block";
+            $("#addplay").html('');
+            PlayListShow.style.display = "none";
+            showsonglistdetails.style.display = "none";
+            showsongaddlistdetails.style.display = "none";
+            btnadd.style.display = "none";
+            songlistdetails.style.display = "block";
+            searchforsongs.style.display = "block";
+            addnewsong.style.display = "none";
             document.getElementById('songlistdetails').innerHTML = "";
             $.ajax({
                 mode: 'cors',
@@ -53,7 +62,8 @@
                     xhr.setRequestHeader("Authorization", "Bearer " + 'xyz');
                 },
                 success: function(result, status, xhr) {
-                    var html = "<table id='tblsongsList' class='table table-condensed table-bordered'><tbody>";
+                    $("#songlistdetails").html('');
+                    var html = "<table id='tblsongsList' class='table table-condensed table-bordered' style='border-left:groove;border-right:groove;border-top:groove;border-bottom:groove;background: antiquewhite;'><tbody>";
                     for (var i = 0; i < result.length; i++) {
                         if (result.length != null) {
                             var songtit = result[i].SongTitle;
@@ -61,7 +71,7 @@
                             var album = result[i].Album;
                             var playduration = result[i].PlayTime;
                         }
-                        html += "<tr><td><p>Song Title: " + songtit + "</p><p>Singer: " + singer + "</p><p>Album:" + album + " </p></td><td style='vertical-align: middle;'><p>Playtime: " + playduration + "</p></td></tr>";
+                        html += "<tr><td><p><b>Song Title:</b> " + songtit + "</p><p><b>Singer:</b> " + singer + "</p><p><b>Album:</b>" + album + " </p></td><td style='vertical-align: middle;'><p><b>Playtime:</b> " + playduration + "</p></td></tr>";
                     }
                     html += "</tbody></table>";
                     $("#songlistdetails").append(html);
@@ -74,15 +84,21 @@
 
 
         function PlayListClk() {
+            addplay.style.display = "block";
+            PlayListShow.style.display = "block";
+            createplaylist.style.display = "block";
             btnadd.style.display = "block";
             songlistdetails.style.display = "none";
+            showsonglistdetails.style.display = "none";
+            showsongaddlistdetails.style.display = "none";
             searchforsongs.style.display = "none";
             addsongs.style.display = "none";
+            addnewsong.style.display = "none";
             var playlist = document.getElementById("PlayListShow");
             if (playlist.style.display === "none") {
                 playlist.style.display = "block";
             } else {
-                playlist.style.display = "none";
+                playlist.style.display = "block";
             }
             $.ajax({
                 mode: 'cors',
@@ -102,7 +118,7 @@
                             var playlistname = result[i].PlayListName;
                             var createddate = result[i].CreatedDate;
                         }
-                        $("#addplay").append('<button id="btnplylst" onclick="addplaylists(' + result[i].PlayListId + ');"  <div class="row border" style="width:520px">' + '<div class="col-md-8" style="padding-right:428px">PlayListId:' + '&nbsp' + playlistid + '</div>' + '<div class="col-md-8" style="padding-right:280px">PlayListName:' + '&nbsp' + playlistname + '</div>' + '<div class="col-md-8" style="padding-right:49px">CreatedDate:' + '&nbsp' + createddate, '</div>', "<br>", '</div>', "</button>")
+                        $("#addplay").append('<button id="btnplylst" onclick="addplaylists(' + result[i].PlayListId + ');"  <div class="row border" style="width:520px;background:papayawhip;">' + '<div class="col-md-8" style="padding-right:428px">PlayListId:' + '&nbsp' + playlistid + '</div>' + '<div class="col-md-8" style="padding-right:280px">PlayListName:' + '&nbsp' + playlistname + '</div>' + '<div class="col-md-8" style="padding-right:49px">CreatedDate:' + '&nbsp' + createddate, '</div>', "<br>", '</div>', "</button>")
                     }
                 },
                 error: function(xhr, status, error) {
@@ -112,6 +128,8 @@
         }
 
         function addplaylists(playlistId) {
+            showsongaddlistdetails.style.display = "none";
+            showsonglistdetails.style.display = "block";
             addsongs.style.display = "none";
             addnewsong.style.display = "block";
             createplaylist.style.display = "none";
@@ -129,6 +147,17 @@
                     xhr.setRequestHeader("Authorization", "Bearer " + 'xyz');
                 },
                 success: function(result, status, xhr) {
+                    $("#showsonglistdetails").html('');
+                    // for (var i = 0; i < result.length; i++) {
+                    //     if (result.length != null) {
+                    //         var songtit = result[i].SongTitle;
+                    //         var singer = result[i].Singers;
+                    //         var album = result[i].Album;
+                    //         var playduration = result[i].PlayTime;
+                    //     }
+                    //     $("#showsonglistdetails").append('<div class="row border" style="width:520px">' + '<div class="col-md-4" style="padding-right:280px">SongTitle:' + '&nbsp' + songtit + '</div>' + '<div class="col-md-1" style="padding-right:280px">Singer:' + '&nbsp' + singer + '<div id="test" style="margin-left:300px;margin-top:-24px">' + '<div id="plytime" class="col-md-1">' + "PlayTime:" + '&nbsp' + playduration + '</div>' + '</div>' + '<div class="col-md-4" style="padding-right:280px">Album:' + '&nbsp' + album, '</div>', "<br>", '</div>')
+                    // }
+                    var html = "<table id='tblshowsongsList' class='table table-condensed table-bordered' style='border-left:groove;border-right:groove;border-top:groove;border-bottom:groove;background:antiquewhite;'><tbody>";
                     for (var i = 0; i < result.length; i++) {
                         if (result.length != null) {
                             var songtit = result[i].SongTitle;
@@ -136,8 +165,10 @@
                             var album = result[i].Album;
                             var playduration = result[i].PlayTime;
                         }
-                        $("#showsonglistdetails").append('<div class="row border" style="width:520px">' + '<div class="col-md-4" style="padding-right:280px">SongTitle:' + '&nbsp' + songtit + '</div>' + '<div class="col-md-1" style="padding-right:280px">Singer:' + '&nbsp' + singer + '<div id="test" style="margin-left:300px;margin-top:-24px">' + '<div id="plytime" class="col-md-1">' + "PlayTime:" + '&nbsp' + playduration + '</div>' + '</div>' + '<div class="col-md-4" style="padding-right:280px">Album:' + '&nbsp' + album, '</div>', "<br>", '</div>')
+                        html += "<tr><td><p><b>Song Title:</b> " + songtit + "</p><p><b>Singer:</b> " + singer + "</p><p><b>Album:</b>" + album + " </p></td><td style='vertical-align: middle;'><p><b>Playtime:</b> " + playduration + "</p></td></tr>";
                     }
+                    html += "</tbody></table>";
+                    $("#showsonglistdetails").append(html);
                 },
                 error: function(xhr, status, error) {
                     alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
@@ -150,6 +181,7 @@
         function Addplaylist() {
             var inputText = document.getElementById('createplaylist').value;
             if (inputText == null | inputText == "") {
+                alert('Please Add the PlayList....!');
                 return false;
             } else {
                 $.ajax({
@@ -167,7 +199,8 @@
                             result.PlayListName = inputText;
                             $("#addplay").append('<button id="btnplylst" onclick="addplaylists();"  <div class="row border" style="width:520px">' + '<div class="col-md-8" style="padding-right:428px">PlayListId:' + '&nbsp' + result.PlayListId + '</div>' + '<div class="col-md-8" style="padding-right:280px">PlayListName:' + '&nbsp' + result.PlayListName + '</div>' + '<div class="col-md-8" style="padding-right:49px">CreatedDate:' + '&nbsp' + result.CreatedDate, '</div>', "<br>", '</div>', "</button>")
                         }
-                        alert('playList Saved Successfully');
+                        alert('PlayList Added Successfully....!');
+                        $('#createplaylist').val("");
                     },
                     error: function(xhr, status, error) {
                         alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
@@ -181,6 +214,7 @@
             addsongs.style.display = "block";
             addnewsong.style.display = "none";
             showsonglistdetails.style.display = "none";
+            showsongaddlistdetails.style.display = "block";
             $.ajax({
                 mode: 'cors',
                 type: "GET",
@@ -192,7 +226,7 @@
                     xhr.setRequestHeader("Authorization", "Bearer " + 'xyz');
                 },
                 success: function(result, status, xhr) {
-                    var html = "<table id='tblAddsongsList' class='table table-condensed table-bordered'><tbody>";
+                    var html = "<table id='tblAddsongsList' class='table table-condensed table-bordered' style='border-left:groove;border-right:groove;border-top:groove;border-bottom:groove;background:antiquewhite;'><tbody>";
                     for (var i = 0; i < result.length; i++) {
                         if (result.length != null) {
                             var songlistid = result[i].SongId;
@@ -201,8 +235,8 @@
                             var album = result[i].Album;
                             var playduration = result[i].PlayTime;
                         }
-                        var idstorage = sessionStorage.getItem("playListId");
-                        html += "<tr><td><p>Song Title: " + songtit + "</p><p>Singer: " + singer + "</p><p>Album:" + album + " </p></td><td style='vertical-align: middle;'><p>Playtime: " + playduration + "</p></td><td><a href='#' style='vertical-align: middle;' onclick='AddSongtoPlayList(" + songlistid + "," + idstorage + ");' id='addsonglist' >Add to List</a></td></tr>";
+                        var playListIdstorage = sessionStorage.getItem("playListId");
+                        html += "<tr><td><p><b>Song Title:</b> " + songtit + "</p><p><b>Singer:</b> " + singer + "</p><p><b>Album:</b>" + album + " </p></td><td style='vertical-align: middle;'><p><b>Playtime:</b> " + playduration + "</p></td><td style='vertical-align: middle;width:99px;'><a href='#' onclick='AddSongtoPlayList(" + songlistid + "," + playListIdstorage + ");' id='addsonglist' >Add to List</a></td></tr>";
 
                     }
                     html += "</tbody></table>";
@@ -214,11 +248,11 @@
             });
         }
 
-        function AddSongtoPlayList(songlistid, idstorage) {
+        function AddSongtoPlayList(songlistid, playListIdstorage) {
             $.ajax({
                 mode: 'cors',
                 type: "POST",
-                url: "http://localhost:60896/api/MusicApp/PlayListSongs?songId=" + songlistid + "&playListId=" + idstorage,
+                url: "http://localhost:60896/api/MusicApp/PlayListSongs?songId=" + songlistid + "&playListId=" + playListIdstorage,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 beforeSend: function(xhr) {
@@ -226,7 +260,10 @@
                     xhr.setRequestHeader("Authorization", "Bearer " + 'xyz');
                 },
                 success: function(result, status, xhr) {
-                    if (result != null) {}
+                    if (result != null) {
+                        alert("Songs List Added Successfully..!")
+                        addplaylists(playListIdstorage);
+                    }
                 },
                 error: function(xhr, status, error) {
                     alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
@@ -234,6 +271,8 @@
             });
 
         }
+
+
 
         function FilterSongList() {
             var value = $("#searchList").val().toLowerCase();
@@ -254,15 +293,15 @@
         <button id="btnlist" type="submit" style="height: 33px;width: 130px; background-color: chartreuse;" onclick="GetAllSongLists()">All Songs</button>
         <button type="submit" style="height: 33px;width: 130px;" onclick="PlayListClk()">PlayLists</button><br>&nbsp;
         <div id="addsongs">
-            <input type="text" id="searchAddsong" onkeyup="FilterAddSongList()" placeholder="Search for Add Songs..." name="search" style="width: 500px;height: 33px;margin-right: 165px;">
+            <input type="text" id="searchAddsong" onkeyup="FilterAddSongList()" autocomplete="off" placeholder="Search for Add Songs..." name="search" style="width: 500px;height: 33px;margin-right: 165px;">
         </div>
         <button id="addnewsong" type="submit" style="height: 33px;width: 130px; background-color: chartreuse;display: none; margin-left:314px;margin-top:-3px;" onclick="Addsongslist()">Add Song</button>
         <div id="PlayListShow" style="display:none;">
-            <input id="createplaylist" type="text" placeholder="Create PlayList" name="search" style="width: 300px;height: 30px;">
+            <input id="createplaylist" type="text" autocomplete="off" placeholder="Create PlayList" name="search" style="width: 300px;height: 30px;">
         </div>&nbsp;
         <button id="btnadd" type="submit" style="height: 33px;width: 130px;" onclick="Addplaylist()">Add PlayList</button>
         <div id="searchforsongs" style="padding-top: 10px;">
-            <input type="text" id="searchList" onkeyup="FilterSongList()" placeholder="Search for Songs..." name="search" style="width: 510px;height: 33px;"></div><br>
+            <input type="text" id="searchList" onkeyup="FilterSongList()" autocomplete="off" placeholder="Search for Songs..." name="search" style="width: 510px;height: 33px;"></div><br>
         <div id="addplay" class="container-mycontainer"></div>
         <div id="addsongplay" class="container-mycontainer" style="display:none;"></div>
         <div id="songlistdetails" class="container-mycontainer">
